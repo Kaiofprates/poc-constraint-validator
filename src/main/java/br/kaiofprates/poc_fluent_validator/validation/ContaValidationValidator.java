@@ -7,36 +7,16 @@ import jakarta.validation.ConstraintValidatorContext;
 public class ContaValidationValidator implements ConstraintValidator<ContaValidation, ContaRequest> {
 
     @Override
-    public void initialize(ContaValidation constraintAnnotation) {
-        // Inicialização se necessário
-    }
-
-    @Override
     public boolean isValid(ContaRequest request, ConstraintValidatorContext context) {
-        if (request == null) {
-            return true;
-        }
-
-        context.disableDefaultConstraintViolation();
-
-        // Validação do tamanho do nome
-        if (request.getNome() != null && request.getNome().length() > 50) {
-            buildConstraintViolation(context, ValidationMessage.NOME_TAMANHO_MAXIMO);
-            return false;
-        }
-
-        // Validação do CNPJ alfanumérico
-        if (request.getCnpj() != null && !request.getCnpj().matches("^[a-zA-Z0-9]*$")) {
-            buildConstraintViolation(context, ValidationMessage.CNPJ_ALFANUMERICO);
-            return false;
-        }
-
-        return true;
-    }
-
-    private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {
-        context.buildConstraintViolationWithTemplate(validationMessage.getMessage())
-                .addPropertyNode(validationMessage.getField())
-                .addConstraintViolation();
+        return ValidationBuilder.of(context)
+                .addRule(ValidationRule.of(
+                        conta -> conta.getNome() == null || conta.getNome().length() <= 50,
+                        ValidationMessage.NOME_TAMANHO_MAXIMO
+                ))
+                .addRule(ValidationRule.of(
+                        conta -> conta.getCnpj() == null || conta.getCnpj().matches("^[a-zA-Z0-9]*$"),
+                        ValidationMessage.CNPJ_ALFANUMERICO
+                ))
+                .validate(request);
     }
 } 

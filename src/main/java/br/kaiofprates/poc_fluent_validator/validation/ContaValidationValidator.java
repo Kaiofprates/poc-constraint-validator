@@ -22,12 +22,16 @@ public class ContaValidationValidator implements ConstraintValidator<ContaValida
 
         // Validação do tamanho do nome
         if (request.getNome() != null && request.getNome().length() > 50) {
-            context.buildConstraintViolationWithTemplate("O nome deve ter no máximo 50 caracteres")
-                    .addPropertyNode("nome")
-                    .addConstraintViolation();
+            buildConstraintViolation(context, ValidationMessage.NOME_TAMANHO_MAXIMO);
             isValid = false;
         }
 
         return isValid;
+    }
+
+    private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {
+        context.buildConstraintViolationWithTemplate(validationMessage.getMessage())
+                .addPropertyNode(validationMessage.getField())
+                .addConstraintViolation();
     }
 } 

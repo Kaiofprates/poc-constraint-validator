@@ -4,10 +4,12 @@ import br.kaiofprates.poc_fluent_validator.dto.ContaRequest;
 import br.kaiofprates.poc_fluent_validator.dto.ContaResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contas")
+@Validated
 public class ContaController {
 
     @PostMapping

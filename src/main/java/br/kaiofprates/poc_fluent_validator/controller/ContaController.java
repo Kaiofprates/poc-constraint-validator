@@ -2,6 +2,7 @@ package br.kaiofprates.poc_fluent_validator.controller;
 
 import br.kaiofprates.poc_fluent_validator.dto.ContaRequest;
 import br.kaiofprates.poc_fluent_validator.dto.ContaResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class ContaController {
 
     @PostMapping
-    public ResponseEntity<ContaResponse> abrirConta(@RequestBody ContaRequest request) {
+    public ResponseEntity<ContaResponse> abrirConta(@Valid @RequestBody ContaRequest request) {
         // Aqui você implementaria a lógica de negócio para abertura de conta
         ContaResponse response = ContaResponse.builder()
                 .numeroConta("123456")

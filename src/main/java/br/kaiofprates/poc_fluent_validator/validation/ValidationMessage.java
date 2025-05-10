@@ -12,7 +12,12 @@ public enum ValidationMessage {
     CNPJ_ALFANUMERICO("O CNPJ deve conter apenas caracteres alfanuméricos", "cnpj"),
     ENDERECO_OBRIGATORIO("O endereço é obrigatório", "endereco"),
     EMAIL_OBRIGATORIO("O email é obrigatório", "email"),
-    TELEFONE_OBRIGATORIO("O telefone é obrigatório", "telefone");
+    TELEFONE_OBRIGATORIO("O telefone é obrigatório", "telefone"),
+    CARTAO_NUMERO_INVALIDO("O número do cartão deve conter 16 dígitos", "cartoes[].numero"),
+    CARTAO_BANDEIRA_OBRIGATORIA("A bandeira do cartão é obrigatória", "cartoes[].bandeira"),
+    CARTAO_TIPO_INVALIDO("O tipo do cartão deve ser CREDITO ou DEBITO", "cartoes[].tipo"),
+    CARTAO_LIMITE_INVALIDO("O limite do cartão deve ser maior que zero", "cartoes[].limite"),
+    CARTAO_DATA_VALIDADE_INVALIDA("A data de validade deve estar no formato MM/YY", "cartoes[].dataValidade");
 
     private final String message;
     private final String field;

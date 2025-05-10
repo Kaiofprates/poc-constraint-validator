@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class ContaValidationValidator implements ConstraintValidator<ContaValidation, ContaRequest> {
 
     private final CartaoValidator cartaoValidator = new CartaoValidator();
+    private final ChavePixValidator chavePixValidator = new ChavePixValidator();
 
     @Override
     public boolean isValid(ContaRequest request, ConstraintValidatorContext context) {
@@ -23,6 +24,8 @@ public class ContaValidationValidator implements ConstraintValidator<ContaValida
                 ))
                 // Validações dos cartões usando o validador específico
                 .addValidator(cartaoValidator, request.getCartoes())
+                // Validações das chaves PIX usando o validador específico
+                .addValidator(chavePixValidator, request.getChavesPix())
                 .validate(request);
     }
 } 

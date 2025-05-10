@@ -31,4 +31,7 @@ public class ContaRequest {
 
     @NotEmpty(message = "Pelo menos um cartão deve ser informado")
     private List<CartaoRequest> cartoes;
+
+    //@NotEmpty(message = "Pelo menos uma chave PIX deve ser informada")
+    private List<ChavePixRequest> chavesPix;
 } 

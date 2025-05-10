@@ -1,13 +1,11 @@
 package br.kaiofprates.poc_fluent_validator.validation;
 
-import br.kaiofprates.poc_fluent_validator.dto.ContaRequest;
 import jakarta.validation.ConstraintValidatorContext;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class ValidationBuilder {
-    private final List<ValidationRule<ContaRequest>> rules;
+public class ValidationBuilder<T> {
+    private final List<ValidationRule<T>> rules;
     private final ConstraintValidatorContext context;
 
     private ValidationBuilder(ConstraintValidatorContext context) {
@@ -15,16 +13,27 @@ public class ValidationBuilder {
         this.context = context;
     }
 
-    public static ValidationBuilder of(ConstraintValidatorContext context) {
-        return new ValidationBuilder(context);
+    public static <T> ValidationBuilder<T> of(ConstraintValidatorContext context) {
+        return new ValidationBuilder<>(context);
     }
 
-    public ValidationBuilder addRule(ValidationRule<ContaRequest> rule) {
+    public ValidationBuilder<T> addRule(ValidationRule<T> rule) {
         rules.add(rule);
         return this;
     }
 
-    public boolean validate(ContaRequest request) {
+    public <U> ValidationBuilder<T> addValidator(Validator<U> validator, List<U> items) {
+        if (items != null) {
+            for (int i = 0; i < items.size(); i++) {
+                if (!validator.isValid(items.get(i), context)) {
+                    return this;
+                }
+            }
+        }
+        return this;
+    }
+
+    public boolean validate(T request) {
         if (request == null) {
             return true;
         }

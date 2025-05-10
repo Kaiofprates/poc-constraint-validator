@@ -7,12 +7,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ValidationMessage {
     NOME_TAMANHO_MAXIMO("O nome deve ter no máximo 50 caracteres", "nome"),
-    CPF_OBRIGATORIO("O CPF é obrigatório", "cpf"),
+    CPF_OBRIGATORIO("O CPF é obrigatório e deve estar no formato 000.000.000-00", "cpf"),
     CNPJ_OBRIGATORIO("O CNPJ é obrigatório", "cnpj"),
     CNPJ_ALFANUMERICO("O CNPJ deve conter apenas caracteres alfanuméricos", "cnpj"),
     ENDERECO_OBRIGATORIO("O endereço é obrigatório", "endereco"),
-    EMAIL_OBRIGATORIO("O email é obrigatório", "email"),
-    TELEFONE_OBRIGATORIO("O telefone é obrigatório", "telefone"),
+    EMAIL_OBRIGATORIO("O email é obrigatório e deve estar em um formato válido", "email"),
+    TELEFONE_OBRIGATORIO("O telefone é obrigatório e deve estar no formato (00) 00000-0000", "telefone"),
+    SALARIO_INVALIDO("O salário deve ser maior que zero", "salario"),
     CARTAO_NUMERO_INVALIDO("O número do cartão deve conter 16 dígitos", "cartoes[].numero"),
     CARTAO_BANDEIRA_OBRIGATORIA("A bandeira do cartão é obrigatória", "cartoes[].bandeira"),
     CARTAO_TIPO_INVALIDO("O tipo do cartão deve ser CREDITO ou DEBITO", "cartoes[].tipo"),

@@ -4,12 +4,12 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 public class ValidationBuilder<T> {
     private final Collection<ValidationRule<T>> rules;
     private final ConstraintValidatorContext context;
+    private boolean isValid = true;
 
     private ValidationBuilder(ConstraintValidatorContext context) {
         this.rules = new ArrayList<>();
@@ -26,12 +26,13 @@ public class ValidationBuilder<T> {
     }
 
     public <U> ValidationBuilder<T> addValidator(Validator<U> validator, Collection<U> items) {
-
-        if (Objects.isNull(items) || items.isEmpty()){
+        if (Objects.isNull(items) || items.isEmpty()) {
             return this;
         }
-        if (items.stream().allMatch(item-> !validator.isValid(item, context))) {
-            return this;
+
+        boolean allValid = items.stream().allMatch(item -> validator.isValid(item, context));
+        if (!allValid) {
+            this.isValid = false;
         }
 
         return this;
@@ -44,11 +45,13 @@ public class ValidationBuilder<T> {
 
         context.disableDefaultConstraintViolation();
 
-        return rules.stream()
+        boolean rulesValid = rules.stream()
                 .filter(rule -> !rule.getPredicate().test(request))
                 .peek(rule -> buildConstraintViolation(context, rule.getValidationMessage()))
                 .findFirst()
                 .isEmpty();
+
+        return rulesValid && isValid;
     }
 
     private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {

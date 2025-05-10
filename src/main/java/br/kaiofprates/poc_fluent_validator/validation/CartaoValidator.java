@@ -4,6 +4,7 @@ import br.kaiofprates.poc_fluent_validator.dto.CartaoRequest;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class CartaoValidator implements Validator<CartaoRequest> {
@@ -13,9 +14,8 @@ public class CartaoValidator implements Validator<CartaoRequest> {
 
     @Override
     public boolean isValid(CartaoRequest cartao, ConstraintValidatorContext context) {
-        if (cartao == null) {
-            return true;
-        }
+        
+        if (Objects.isNull(cartao)) return true;
 
         return ValidationBuilder.<CartaoRequest>of(context)
                 .addRule(ValidationRule.of(

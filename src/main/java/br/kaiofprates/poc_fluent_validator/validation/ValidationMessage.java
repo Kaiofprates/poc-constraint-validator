@@ -9,6 +9,7 @@ public enum ValidationMessage {
     NOME_TAMANHO_MAXIMO("O nome deve ter no máximo 50 caracteres", "nome"),
     CPF_OBRIGATORIO("O CPF é obrigatório", "cpf"),
     CNPJ_OBRIGATORIO("O CNPJ é obrigatório", "cnpj"),
+    CNPJ_ALFANUMERICO("O CNPJ deve conter apenas caracteres alfanuméricos", "cnpj"),
     ENDERECO_OBRIGATORIO("O endereço é obrigatório", "endereco"),
     EMAIL_OBRIGATORIO("O email é obrigatório", "email"),
     TELEFONE_OBRIGATORIO("O telefone é obrigatório", "telefone");

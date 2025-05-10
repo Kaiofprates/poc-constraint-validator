@@ -17,16 +17,21 @@ public class ContaValidationValidator implements ConstraintValidator<ContaValida
             return true;
         }
 
-        boolean isValid = true;
         context.disableDefaultConstraintViolation();
 
         // Validação do tamanho do nome
         if (request.getNome() != null && request.getNome().length() > 50) {
             buildConstraintViolation(context, ValidationMessage.NOME_TAMANHO_MAXIMO);
-            isValid = false;
+            return false;
         }
 
-        return isValid;
+        // Validação do CNPJ alfanumérico
+        if (request.getCnpj() != null && !request.getCnpj().matches("^[a-zA-Z0-9]*$")) {
+            buildConstraintViolation(context, ValidationMessage.CNPJ_ALFANUMERICO);
+            return false;
+        }
+
+        return true;
     }
 
     private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {

@@ -1,11 +1,14 @@
 package br.kaiofprates.poc_fluent_validator.validation;
 
 import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 public class ValidationBuilder<T> {
-    private final List<ValidationRule<T>> rules;
+    private final Collection<ValidationRule<T>> rules;
     private final ConstraintValidatorContext context;
 
     private ValidationBuilder(ConstraintValidatorContext context) {
@@ -22,14 +25,15 @@ public class ValidationBuilder<T> {
         return this;
     }
 
-    public <U> ValidationBuilder<T> addValidator(Validator<U> validator, List<U> items) {
-        if (items != null) {
-            for (int i = 0; i < items.size(); i++) {
-                if (!validator.isValid(items.get(i), context)) {
-                    return this;
-                }
-            }
+    public <U> ValidationBuilder<T> addValidator(Validator<U> validator, Collection<U> items) {
+
+        if (Objects.isNull(items) || items.isEmpty()){
+            return this;
         }
+        if (items.stream().allMatch(item-> !validator.isValid(item, context))) {
+            return this;
+        }
+
         return this;
     }
 

@@ -7,9 +7,6 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class ContaValidationValidator implements ConstraintValidator<ContaValidation, ContaRequest> {
 
-    private final CartaoValidator cartaoValidator = new CartaoValidator();
-    private final ChavePixValidator chavePixValidator = new ChavePixValidator();
-
     @Override
     public boolean isValid(ContaRequest request, ConstraintValidatorContext context) {
         return ValidationBuilder.<ContaRequest>of(context)
@@ -23,9 +20,10 @@ public class ContaValidationValidator implements ConstraintValidator<ContaValida
                         ValidationMessage.CNPJ_ALFANUMERICO
                 ))
                 // Validações dos cartões usando o validador específico
-                .addValidator(cartaoValidator, request.getCartoes())
+                .addValidator(new CartaoValidator(), request.getCartoes())
                 // Validações das chaves PIX usando o validador específico
-                .addValidator(chavePixValidator, request.getChavesPix())
+                .addValidator(new ChavePixValidator(), request.getChavesPix())
                 .validate(request);
+
     }
 } 

@@ -2,6 +2,7 @@ package br.kaiofprates.poc_fluent_validator.validation;
 
 import br.kaiofprates.poc_fluent_validator.dto.CartaoRequest;
 import jakarta.validation.ConstraintValidatorContext;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -23,7 +24,7 @@ public class CartaoValidator implements Validator<CartaoRequest> {
                         ValidationMessage.CARTAO_NUMERO_INVALIDO
                 ))
                 .addRule(ValidationRule.of(
-                        c -> c.getBandeira() != null && !c.getBandeira().trim().isEmpty(),
+                        c -> Strings.isNotEmpty(c.getBandeira()),
                         ValidationMessage.CARTAO_BANDEIRA_OBRIGATORIA
                 ))
                 .addRule(ValidationRule.of(

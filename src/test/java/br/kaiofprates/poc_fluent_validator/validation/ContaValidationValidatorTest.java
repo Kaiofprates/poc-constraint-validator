@@ -215,6 +215,57 @@ class ContaValidationValidatorTest {
         verify(context).buildConstraintViolationWithTemplate(ValidationMessage.ENDERECO_OBRIGATORIO.getMessage());
     }
 
+    @Test
+    void deveInvalidarContaComCPFNulo() {
+        // Arrange
+        ContaRequest request = criarContaRequestValida();
+        request.setCpf(null);
+
+        // Act
+        boolean isValid = validator.isValid(request, context);
+
+        // Assert
+        assertFalse(isValid);
+        verify(context).buildConstraintViolationWithTemplate(ValidationMessage.CPF_OBRIGATORIO.getMessage());
+        // Verifica que apenas a mensagem do CPF foi gerada, nenhuma outra validação foi executada
+        verify(context, times(1)).buildConstraintViolationWithTemplate(anyString());
+    }
+
+    @Test
+    void deveInvalidarContaComCPFEmFormatoInvalido() {
+        // Arrange
+        ContaRequest request = criarContaRequestValida();
+        request.setCpf("12345678900"); // CPF sem formatação
+
+        // Act
+        boolean isValid = validator.isValid(request, context);
+
+        // Assert
+        assertFalse(isValid);
+        verify(context).buildConstraintViolationWithTemplate(ValidationMessage.CPF_OBRIGATORIO.getMessage());
+        // Verifica que apenas a mensagem do CPF foi gerada, nenhuma outra validação foi executada
+        verify(context, times(1)).buildConstraintViolationWithTemplate(anyString());
+    }
+
+    @Test
+    void deveValidarContaComCPFValidoEOutrosCamposInvalidos() {
+        // Arrange
+        ContaRequest request = criarContaRequestValida();
+        request.setCpf("123.456.789-00"); // CPF válido
+        request.setNome("a".repeat(51)); // Nome inválido
+        request.setEmail("email-invalido"); // Email inválido
+        request.setTelefone("123456789"); // Telefone inválido
+
+        // Act
+        boolean isValid = validator.isValid(request, context);
+
+        // Assert
+        assertFalse(isValid);
+        // Verifica que apenas a primeira mensagem de erro foi gerada (nome)
+        verify(context, times(1)).buildConstraintViolationWithTemplate(anyString());
+        verify(context).buildConstraintViolationWithTemplate(ValidationMessage.NOME_TAMANHO_MAXIMO.getMessage());
+    }
+
     private ContaRequest criarContaRequestValida() {
         ContaRequest request = new ContaRequest();
         request.setNome("João Silva");

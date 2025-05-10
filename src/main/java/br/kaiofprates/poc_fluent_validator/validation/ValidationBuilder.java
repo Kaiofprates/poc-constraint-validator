@@ -8,11 +8,13 @@ import java.util.Objects;
 
 public class ValidationBuilder<T> {
     private final Collection<ValidationRule<T>> rules;
+    private final Collection<ValidationRule<T>> criticalRules;
     private final ConstraintValidatorContext context;
     private boolean isValid = true;
 
     private ValidationBuilder(ConstraintValidatorContext context) {
         this.rules = new ArrayList<>();
+        this.criticalRules = new ArrayList<>();
         this.context = context;
     }
 
@@ -22,6 +24,11 @@ public class ValidationBuilder<T> {
 
     public ValidationBuilder<T> addRule(ValidationRule<T> rule) {
         rules.add(rule);
+        return this;
+    }
+
+    public ValidationBuilder<T> addCriticalRule(ValidationRule<T> rule) {
+        criticalRules.add(rule);
         return this;
     }
 
@@ -45,6 +52,19 @@ public class ValidationBuilder<T> {
 
         context.disableDefaultConstraintViolation();
 
+        // Primeiro valida as regras críticas
+        boolean criticalRulesValid = criticalRules.stream()
+                .filter(rule -> !rule.getPredicate().test(request))
+                .peek(rule -> buildConstraintViolation(context, rule.getValidationMessage()))
+                .findFirst()
+                .isEmpty();
+
+        // Se alguma regra crítica falhou, retorna false imediatamente
+        if (!criticalRulesValid) {
+            return false;
+        }
+
+        // Se todas as regras críticas passaram, valida as regras normais
         boolean rulesValid = rules.stream()
                 .filter(rule -> !rule.getPredicate().test(request))
                 .peek(rule -> buildConstraintViolation(context, rule.getValidationMessage()))

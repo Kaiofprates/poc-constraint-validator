@@ -16,14 +16,15 @@ public class ContaValidationValidator implements ConstraintValidator<ContaValida
     @Override
     public boolean isValid(ContaRequest request, ConstraintValidatorContext context) {
         return ValidationBuilder.<ContaRequest>of(context)
+                // Regra crítica para CPF
+                .addCriticalRule(ValidationRule.of(
+                        conta -> conta.getCpf() != null && CPF_PATTERN.matcher(conta.getCpf()).matches(),
+                        ValidationMessage.CPF_OBRIGATORIO
+                ))
                 // Validações da conta
                 .addRule(ValidationRule.of(
                         conta -> conta.getNome() == null || conta.getNome().length() <= 50,
                         ValidationMessage.NOME_TAMANHO_MAXIMO
-                ))
-                .addRule(ValidationRule.of(
-                        conta -> conta.getCpf() != null && CPF_PATTERN.matcher(conta.getCpf()).matches(),
-                        ValidationMessage.CPF_OBRIGATORIO
                 ))
                 .addRule(ValidationRule.of(
                         conta -> conta.getCnpj() == null || conta.getCnpj().matches("^[a-zA-Z0-9]*$"),

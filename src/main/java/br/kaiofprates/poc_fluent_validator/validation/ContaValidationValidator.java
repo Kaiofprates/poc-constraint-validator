@@ -22,30 +22,12 @@ public class ContaValidationValidator implements ConstraintValidator<ContaValida
                         ValidationMessage.CPF_OBRIGATORIO
                 ))
                 // Validações da conta
-                .addRule(ValidationRule.of(
-                        conta -> conta.getNome() == null || conta.getNome().length() <= 50,
-                        ValidationMessage.NOME_TAMANHO_MAXIMO
-                ))
-                .addRule(ValidationRule.of(
-                        conta -> conta.getCnpj() == null || conta.getCnpj().matches("^[a-zA-Z0-9]*$"),
-                        ValidationMessage.CNPJ_ALFANUMERICO
-                ))
-                .addRule(ValidationRule.of(
-                        conta -> conta.getEmail() == null || EMAIL_PATTERN.matcher(conta.getEmail()).matches(),
-                        ValidationMessage.EMAIL_OBRIGATORIO
-                ))
-                .addRule(ValidationRule.of(
-                        conta -> conta.getTelefone() == null || TELEFONE_PATTERN.matcher(conta.getTelefone()).matches(),
-                        ValidationMessage.TELEFONE_OBRIGATORIO
-                ))
-                .addRule(ValidationRule.of(
-                        conta -> conta.getSalario() == null || conta.getSalario() > 0,
-                        ValidationMessage.SALARIO_INVALIDO
-                ))
-                .addRule(ValidationRule.of(
-                        conta -> Strings.isNotEmpty(conta.getEndereco()),
-                        ValidationMessage.ENDERECO_OBRIGATORIO
-                ))
+                .addRuleMaxLength(ContaRequest::getNome, 50, ValidationMessage.NOME_TAMANHO_MAXIMO)
+                .addRulePattern(ContaRequest::getCnpj, Pattern.compile("^[a-zA-Z0-9]*$"), ValidationMessage.CNPJ_ALFANUMERICO)
+                .addRulePattern(ContaRequest::getEmail, EMAIL_PATTERN, ValidationMessage.EMAIL_OBRIGATORIO)
+                .addRulePattern(ContaRequest::getTelefone, TELEFONE_PATTERN, ValidationMessage.TELEFONE_OBRIGATORIO)
+                .addRuleMinValue(ContaRequest::getSalario, 0.0, ValidationMessage.SALARIO_INVALIDO)
+                .addRuleNotEmpty(ContaRequest::getEndereco, ValidationMessage.ENDERECO_OBRIGATORIO)
                 // Validações dos cartões usando o validador específico
                 .addValidator(new CartaoValidator(), request.getCartoes())
                 // Validações das chaves PIX usando o validador específico

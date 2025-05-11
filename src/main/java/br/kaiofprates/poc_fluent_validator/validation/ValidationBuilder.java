@@ -5,6 +5,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 public class ValidationBuilder<T> {
     private final Collection<ValidationRule<T>> rules;
@@ -25,6 +27,53 @@ public class ValidationBuilder<T> {
     public ValidationBuilder<T> addRule(ValidationRule<T> rule) {
         rules.add(rule);
         return this;
+    }
+
+    public ValidationBuilder<T> addRuleNonNull(Function<T, Object> fieldSelector, ValidationMessage message) {
+        return addRule(ValidationRule.of(
+                obj -> fieldSelector.apply(obj) != null,
+                message
+        ));
+    }
+
+    public ValidationBuilder<T> addRulePattern(Function<T, String> fieldSelector, Pattern pattern, ValidationMessage message) {
+        return addRule(ValidationRule.of(
+                obj -> {
+                    String value = fieldSelector.apply(obj);
+                    return value == null || pattern.matcher(value).matches();
+                },
+                message
+        ));
+    }
+
+    public ValidationBuilder<T> addRuleMaxLength(Function<T, String> fieldSelector, int maxLength, ValidationMessage message) {
+        return addRule(ValidationRule.of(
+                obj -> {
+                    String value = fieldSelector.apply(obj);
+                    return value == null || value.length() <= maxLength;
+                },
+                message
+        ));
+    }
+
+    public ValidationBuilder<T> addRuleMinValue(Function<T, Number> fieldSelector, Number minValue, ValidationMessage message) {
+        return addRule(ValidationRule.of(
+                obj -> {
+                    Number value = fieldSelector.apply(obj);
+                    return value == null || value.doubleValue() >= minValue.doubleValue();
+                },
+                message
+        ));
+    }
+
+    public ValidationBuilder<T> addRuleNotEmpty(Function<T, String> fieldSelector, ValidationMessage message) {
+        return addRule(ValidationRule.of(
+                obj -> {
+                    String value = fieldSelector.apply(obj);
+                    return value != null && !value.trim().isEmpty();
+                },
+                message
+        ));
     }
 
     public ValidationBuilder<T> addCriticalRule(ValidationRule<T> rule) {

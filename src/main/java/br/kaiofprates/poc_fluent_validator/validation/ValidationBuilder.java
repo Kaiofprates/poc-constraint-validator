@@ -75,7 +75,13 @@ public class ValidationBuilder<T> {
     }
 
     private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {
-        context.buildConstraintViolationWithTemplate(validationMessage.getMessage())
+        ValidationError error = new ValidationError(
+            validationMessage.getMessage(),
+            validationMessage.getField(),
+            validationMessage.getErrorCode()
+        );
+        
+        context.buildConstraintViolationWithTemplate(error.toString())
                 .addPropertyNode(validationMessage.getField())
                 .addConstraintViolation();
     }

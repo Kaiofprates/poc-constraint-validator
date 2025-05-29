@@ -17,6 +17,7 @@ public enum ValidationMessage {
     CARTAO_NUMERO_INVALIDO("O número do cartão deve conter 16 dígitos", "cartoes[].numero"),
     CARTAO_BANDEIRA_OBRIGATORIA("A bandeira do cartão é obrigatória", "cartoes[].bandeira"),
     CARTAO_TIPO_INVALIDO("O tipo do cartão deve ser CREDITO ou DEBITO", "cartoes[].tipo"),
+    CARTAO_POUPANCA_INVALIDO("O tipo do cartão deve ser somente DEBITO", "cartoes[].tipo"),
     CARTAO_LIMITE_INVALIDO("O limite do cartão deve ser maior que zero", "cartoes[].limite"),
     CARTAO_DATA_VALIDADE_INVALIDA("A data de validade deve estar no formato MM/YY", "cartoes[].dataValidade"),
     TIPO_CHAVE_PIX_INVALIDO("O tipo da chave PIX deve ser CPF, CNPJ, EMAIL, TELEFONE ou CHAVE_ALEATORIA", "chavesPix[].tipo"),

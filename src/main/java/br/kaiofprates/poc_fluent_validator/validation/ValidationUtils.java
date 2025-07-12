@@ -255,8 +255,12 @@ public class ValidationUtils {
     public static boolean deveSerUrl(String value) {
         if (value == null) return false;
         try {
-            new java.net.URL(value);
-            return true;
+            java.net.URL url = new java.net.URL(value);
+            // Verifica se tem protocolo e host válidos
+            return url.getProtocol() != null && 
+                   url.getHost() != null && 
+                   !url.getHost().isEmpty() &&
+                   !value.endsWith("://");
         } catch (java.net.MalformedURLException e) {
             return false;
         }

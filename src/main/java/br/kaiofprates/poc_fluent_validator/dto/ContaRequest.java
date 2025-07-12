@@ -1,6 +1,5 @@
 package br.kaiofprates.poc_fluent_validator.dto;
 
-import br.kaiofprates.poc_fluent_validator.validation.ContaValidation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -8,7 +7,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@ContaValidation
 public class ContaRequest {
     @NotBlank(message = "O nome é obrigatório")
     private String nome;

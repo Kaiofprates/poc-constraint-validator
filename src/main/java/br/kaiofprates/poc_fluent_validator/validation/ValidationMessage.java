@@ -21,7 +21,10 @@ public enum ValidationMessage {
     CARTAO_LIMITE_INVALIDO("O limite do cartão deve ser maior que zero", "cartoes[].limite"),
     CARTAO_DATA_VALIDADE_INVALIDA("A data de validade deve estar no formato MM/YY", "cartoes[].dataValidade"),
     TIPO_CHAVE_PIX_INVALIDO("O tipo da chave PIX deve ser CPF, CNPJ, EMAIL, TELEFONE ou CHAVE_ALEATORIA", "chavesPix[].tipo"),
-    VALOR_CHAVE_PIX_INVALIDO("O valor da chave PIX não corresponde ao formato esperado para o tipo informado", "chavesPix[].valor");
+    VALOR_CHAVE_PIX_INVALIDO("O valor da chave PIX não corresponde ao formato esperado para o tipo informado", "chavesPix[].valor"),
+    RECEBEDOR_OBJETO_VAZIO("O recebedor não pode ser um objeto vazio", "recebedor"),
+    RECEBEDOR_CAMPOS_OBRIGATORIOS("Apenas um dos campos deve ser informado: cpfCnpj ou idConta", "recebedor"),
+    ID_CONTA_RECEBEDOR_CONFLITO("Quando idConta é informado na raiz, o recebedor não deve ser informado e vice-versa", "idConta");
 
     private final String message;
     private final String field;

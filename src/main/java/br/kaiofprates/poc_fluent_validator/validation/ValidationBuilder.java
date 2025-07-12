@@ -123,7 +123,8 @@ public class ValidationBuilder<T> {
         return rulesValid && isValid;
     }
 
-    private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {
+    private static void buildConstraintViolation(ConstraintValidatorContext context,
+     ValidationMessage validationMessage) {
         context.buildConstraintViolationWithTemplate(validationMessage.getMessage())
                 .addPropertyNode(validationMessage.getField())
                 .addConstraintViolation();

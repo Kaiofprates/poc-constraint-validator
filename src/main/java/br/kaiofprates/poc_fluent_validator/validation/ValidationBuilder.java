@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 public class ValidationBuilder<T> {
@@ -51,7 +50,8 @@ public class ValidationBuilder<T> {
                 .isEmpty();
     }
 
-    private static void buildConstraintViolation(ConstraintValidatorContext context, ValidationMessage validationMessage) {
+    private static void buildConstraintViolation(ConstraintValidatorContext context,
+     ValidationMessage validationMessage) {
         context.buildConstraintViolationWithTemplate(validationMessage.getMessage())
                 .addPropertyNode(validationMessage.getField())
                 .addConstraintViolation();

@@ -28,10 +28,14 @@ public class ContaRequest {
     
     @NotBlank(message = "O telefone é obrigatório")
     private String telefone;
+    
+    private String idConta;
 
     @NotEmpty(message = "Pelo menos um cartão deve ser informado")
     private List<CartaoRequest> cartoes;
 
     //@NotEmpty(message = "Pelo menos uma chave PIX deve ser informada")
     private List<ChavePixRequest> chavesPix;
+    
+    private RecebedorRequest recebedor;
 } 

@@ -1,460 +1,250 @@
-# Poc Fluent Validator
+# POC Fluent Validator
 
-Este projeto é uma prova de conceito (POC) que implementa um validador fluente para validação de dados em Java, utilizando uma abordagem mais elegante e legível para validações. O projeto inclui uma biblioteca abrangente de métodos utilitários de validação (`ValidationUtils`) que podem ser usados em qualquer contexto de validação.
+Este projeto demonstra uma implementação avançada de validadores customizados com predicados em Java, oferecendo duas abordagens de validação:
 
-## Diagrama UML do Fluxo de Validação
+1. **ValidationBuilder** - Integrado com Bean Validation (ConstraintValidator)
+2. **CustomValidator** - Sistema independente de validação customizada
 
-```mermaid
-classDiagram
-    class Validator {
-        <<interface>>
-        +isValid(T, ConstraintValidatorContext)
-    }
+## Características
 
-    class ContaValidationValidator {
-        +isValid(ContaRequest, ConstraintValidatorContext)
-    }
+### ValidationBuilder (Integrado com Bean Validation)
+- Integração com `@Valid` e `@Validated`
+- Suporte a validações customizadas com predicados
+- Regras críticas que falham imediatamente
+- Validação de coleções aninhadas
 
-    class ValidationBuilder {
-        +of(ConstraintValidatorContext)
-        +addRule(ValidationRule)
-        +validate(T)
-    }
-
-    class ValidationRule {
-        +of(Predicate, ValidationMessage)
-    }
-
-    class ValidationMessage {
-        <<enumeration>>
-        NOME_INVALIDO
-        CPF_INVALIDO
-        CNPJ_INVALIDO
-        ENDERECO_INVALIDO
-        SALARIO_INVALIDO
-        EMAIL_INVALIDO
-        TELEFONE_INVALIDO
-        PIX_INVALIDO
-        CARTAO_INVALIDO
-    }
-
-    class ValidationUtils {
-        <<utility>>
-        +quandoNaoNulo(Object)
-        +naoDeveSerNulo(Object)
-        +deveSerNulo(Object)
-        +deveSerIgual(Object, Object)
-        +apenasUmPreenchido(Object...)
-        +peloMenosUmPreenchido(Object...)
-        +deveSerVazio(String)
-        +naoDeveSerVazio(String)
-        +deveTerTamanho(String, int)
-        +deveSerEmail(String)
-        +deveSerCpf(String)
-        +deveSerCnpj(String)
-        +deveSerCep(String)
-        +deveSerTelefone(String)
-        +deveSerPositivo(Number)
-        +deveEstarEntre(Number, Number, Number)
-        +deveSerVazio(Collection)
-        +deveSerDataFutura(LocalDate)
-        +deveSeguirPadrao(String, String)
-        +deveSerUrl(String)
-        +deveSerIpv4(String)
-        +deveTerSenhaForte(String)
-    }
-
-    Validator <|.. ContaValidationValidator : implements
-    ContaValidationValidator --> ValidationBuilder : utiliza
-    ValidationBuilder --> ValidationRule : compõe
-    ValidationRule --> ValidationMessage : utiliza
-    ValidationBuilder --> ValidationUtils : utiliza
-```
-
-## Funcionalidades
-
-### Validação de Dados Pessoais
-- Nome (3-50 caracteres)
-- CPF (formato brasileiro)
-- CNPJ (formato brasileiro)
-
-### Validação de Contato
-- Email (formato válido)
-- Telefone (formato brasileiro)
-
-### Validação de Endereço
-- Endereço completo
-
-### Validação Financeira
-- Salário (deve ser positivo)
-- Chaves PIX (CPF, Email, Celular, Chave Aleatória)
-- Cartões de crédito/débito
-  - Número do cartão (16 dígitos)
-  - Bandeira (obrigatória)
-  - Tipo (CREDITO ou DEBITO)
-  - Limite (deve ser maior que zero)
-  - Data de validade (formato MM/YY)
-
-## ValidationUtils - Biblioteca de Validação
-
-A classe `ValidationUtils` oferece uma ampla gama de métodos utilitários para validação que podem ser usados em qualquer contexto:
-
-### Validações Básicas
-```java
-// Verificar se valor não é null
-ValidationUtils.naoDeveSerNulo(valor);
-
-// Verificar se valor é null
-ValidationUtils.deveSerNulo(valor);
-
-// Verificar igualdade
-ValidationUtils.deveSerIgual(valor1, valor2);
-
-// Verificar se apenas um valor está preenchido
-ValidationUtils.apenasUmPreenchido(valor1, valor2, valor3);
-
-// Verificar se pelo menos um valor está preenchido
-ValidationUtils.peloMenosUmPreenchido(valor1, valor2, valor3);
-```
-
-### Validações de String
-```java
-// Verificar se string está vazia
-ValidationUtils.deveSerVazio(texto);
-ValidationUtils.naoDeveSerVazio(texto);
-
-// Verificar tamanho
-ValidationUtils.deveTerTamanho(texto, 10);
-ValidationUtils.deveTerTamanhoMinimo(texto, 5);
-ValidationUtils.deveTerTamanhoMaximo(texto, 20);
-ValidationUtils.deveTerTamanhoEntre(texto, 5, 20);
-
-// Validações específicas brasileiras
-ValidationUtils.deveSerEmail("usuario@email.com");
-ValidationUtils.deveSerCpf("123.456.789-00");
-ValidationUtils.deveSerCnpj("12.345.678/0001-90");
-ValidationUtils.deveSerCep("12345-678");
-ValidationUtils.deveSerTelefone("(11) 99999-9999");
-```
-
-### Validações Numéricas
-```java
-// Verificar sinais
-ValidationUtils.deveSerPositivo(100);
-ValidationUtils.deveSerNegativo(-50);
-ValidationUtils.deveSerZero(0);
-
-// Comparações
-ValidationUtils.deveSerMaiorQue(100, 50);
-ValidationUtils.deveSerMenorQue(50, 100);
-ValidationUtils.deveSerMaiorOuIgualA(100, 100);
-ValidationUtils.deveSerMenorOuIgualA(50, 100);
-ValidationUtils.deveEstarEntre(75, 50, 100);
-
-// Lógica de negócio
-ValidationUtils.deveSerPar(100);
-ValidationUtils.deveSerImpar(99);
-ValidationUtils.deveSerDivisivelPor(100, 5);
-```
-
-### Validações de Coleções
-```java
-List<String> lista = Arrays.asList("a", "b", "c");
-
-ValidationUtils.deveSerVazio(lista);
-ValidationUtils.naoDeveSerVazio(lista);
-ValidationUtils.deveTerTamanho(lista, 3);
-ValidationUtils.deveTerTamanhoMinimo(lista, 2);
-ValidationUtils.deveTerTamanhoMaximo(lista, 5);
-ValidationUtils.deveTerTamanhoEntre(lista, 2, 5);
-```
-
-### Validações de Data
-```java
-LocalDate hoje = LocalDate.now();
-LocalDate amanha = hoje.plusDays(1);
-LocalDate ontem = hoje.minusDays(1);
-
-ValidationUtils.deveSerDataFutura(amanha);
-ValidationUtils.deveSerDataPassada(ontem);
-ValidationUtils.deveSerDataHoje(hoje);
-ValidationUtils.deveSerDataEntre(hoje, ontem, amanha);
-```
-
-### Validações de Padrão
-```java
-// Regex customizado
-ValidationUtils.deveSeguirPadrao("123", "\\d+");
-
-// Tipos de caracteres
-ValidationUtils.deveConterApenasNumeros("123456");
-ValidationUtils.deveConterApenasLetras("João Silva");
-ValidationUtils.deveConterApenasLetrasENumeros("João123");
-```
-
-### Validações Específicas
-```java
-// URLs e IPs
-ValidationUtils.deveSerUrl("https://www.google.com");
-ValidationUtils.deveSerIpv4("192.168.1.1");
-
-// Senhas
-ValidationUtils.deveTerSenhaForte("Senha@123");
-```
-
-### Validação Condicional
-```java
-// Validar apenas se o valor não for null
-ValidationUtils.quandoNaoNulo(telefone)
-    .entao(() -> ValidationUtils.deveSerTelefone(telefone));
-
-// Ou com boolean direto
-ValidationUtils.quandoNaoNulo(email)
-    .entao(ValidationUtils.deveSerEmail(email));
-```
-
-## Como Usar
-
-### Exemplo de Requisição
-
-```json
-POST /api/conta
-Content-Type: application/json
-
-{
-    "nome": "João Silva",
-    "cpf": "123.456.789-00",
-    "cnpj": "12345678000190",
-    "endereco": "Rua Exemplo, 123",
-    "salario": 5000.00,
-    "email": "teste@email.com",
-    "telefone": "(11) 99999-9999",
-    "chavesPix": [
-        {
-            "tipo": "CPF",
-            "valor": "123.456.789-00"
-        },
-        {
-            "tipo": "EMAIL",
-            "valor": "joao@email.com"
-        }
-    ],
-    "cartoes": [
-        {
-            "numero": "1234567890123456",
-            "bandeira": "VISA",
-            "tipo": "CREDITO",
-            "limite": 5000.00,
-            "dataValidade": "12/25"
-        },
-        {
-            "numero": "9876543210987654",
-            "bandeira": "MASTERCARD",
-            "tipo": "DEBITO",
-            "limite": 1000.00,
-            "dataValidade": "06/24"
-        }
-    ]
-}
-```
-
-### Exemplo de Resposta de Sucesso
-
-```json
-{
-    "status": "SUCCESS",
-    "message": "Conta validada com sucesso"
-}
-```
-
-### Exemplo de Resposta de Erro
-
-```json
-{
-    "status": "ERROR",
-    "message": "Nome inválido: deve ter entre 3 e 50 caracteres"
-}
-```
-
-## Testes
-
-O projeto inclui uma suíte completa de testes unitários para todos os métodos de validação:
-
-### Executar Testes
-```bash
-# Executar todos os testes
-./mvnw test
-
-# Executar testes específicos
-./mvnw test -Dtest=ValidationUtilsTest
-
-# Executar com relatório de cobertura
-./mvnw test jacoco:report
-```
-
-### Cobertura de Testes
-- **ValidationUtils**: 100% de cobertura
-- **Validadores de Negócio**: Testes de integração
-- **Controllers**: Testes de API
-
-### Estrutura dos Testes
-```
-src/test/java/br/kaiofprates/poc_fluent_validator/validation/
-└── ValidationUtilsTest.java
-    ├── ConditionalValidatorTests
-    ├── ValidacoesBasicasTests
-    ├── ValidacoesStringTests
-    ├── ValidacoesNumeroTests
-    ├── ValidacoesColecaoTests
-    ├── ValidacoesDataTests
-    ├── ValidacoesPadraoTests
-    ├── ValidacoesLogicaNegocioTests
-    └── ValidacoesEspecificasTests
-```
-
-## Tecnologias Utilizadas
-
-- **Java 17** - Linguagem principal
-- **Spring Boot 3.x** - Framework web
-- **Jakarta Validation** - Anotações de validação
-- **JUnit 5** - Framework de testes
-- **Maven** - Gerenciador de dependências
-
-## Como Executar
-
-### Pré-requisitos
-- Java 17 ou superior
-- Maven 3.6+
-
-### Passos para Execução
-
-1. Clone o repositório
-```bash
-git clone https://github.com/seu-usuario/poc-fluent-validator.git
-```
-
-2. Entre no diretório do projeto
-```bash
-cd poc-fluent-validator
-```
-
-3. Execute o projeto
-```bash
-./mvnw spring-boot:run
-```
-
-4. Acesse a aplicação
-```
-http://localhost:8080
-```
-
-### Endpoints Disponíveis
-
-- `POST /api/conta` - Validar dados de conta
-- `GET /actuator/health` - Health check da aplicação
+### CustomValidator (Independente)
+- API fluente e intuitiva
+- Independente do Bean Validation
+- Retorna `ValidationResult` com status e lista de erros
+- Suporte ao método `orThrows()` para lançar exceções
+- Validação de coleções e objetos aninhados
+- Regras críticas e normais
+- **Arquitetura Flexível**: Interface permite múltiplas implementações
+- **Validação Assíncrona**: Suporte a execução paralela para melhor performance
 
 ## Estrutura do Projeto
 
 ```
-src/
-├── main/
-│   ├── java/br/kaiofprates/poc_fluent_validator/
-│   │   ├── controller/
-│   │   │   └── ContaController.java
-│   │   ├── dto/
-│   │   │   ├── ContaRequest.java
-│   │   │   ├── ContaResponse.java
-│   │   │   ├── ChavePixRequest.java
-│   │   │   ├── CartaoRequest.java
-│   │   │   └── RecebedorRequest.java
-│   │   ├── exception/
-│   │   │   └── ValidationExceptionHandler.java
-│   │   ├── validation/
-│   │   │   ├── ValidationUtils.java
-│   │   │   ├── ContaValidationValidator.java
-│   │   │   ├── ValidationBuilder.java
-│   │   │   ├── ValidationRule.java
-│   │   │   ├── ValidationMessage.java
-│   │   │   ├── Validator.java
-│   │   │   ├── CartaoValidator.java
-│   │   │   ├── ChavePixValidator.java
-│   │   │   ├── ChavePixPatterns.java
-│   │   │   └── ValidationUtils.java
-│   │   └── PocFluentValidatorApplication.java
-│   └── resources/
-│       └── application.properties
-└── test/
-    └── java/br/kaiofprates/poc_fluent_validator/
-        ├── validation/
-        │   └── ValidationUtilsTest.java
-        └── PocFluentValidatorApplicationTests.java
+src/main/java/br/kaiofprates/poc_fluent_validator/
+├── config/
+│   └── WebConfig.java
+├── controller/
+│   ├── ContaController.java (ValidationBuilder)
+│   ├── ContaFluentController.java (FluentValidator)
+│   └── ContaPoupancaController.java
+├── dto/
+│   ├── CartaoRequest.java
+│   ├── ChavePixRequest.java
+│   ├── ContaRequest.java
+│   ├── ContaResponse.java
+│   └── RecebedorRequest.java
+├── exception/
+│   └── ValidationExceptionHandler.java
+├── interceptor/
+│   └── ValidationExceptionHandlerInterceptor.java
+├── validation/
+│   ├── ValidationBuilder.java (Sistema original)
+│   ├── CustomValidator.java (Novo sistema)
+│   ├── ValidationResult.java
+│   ├── ValidationError.java
+│   ├── ValidationException.java
+│   ├── ContaFluentValidator.java
+│   └── ... (outros validadores)
+└── PocFluentValidatorApplication.java
 ```
 
-## Casos de Uso
+## Arquitetura do CustomValidator
 
-### 1. Validação de Formulários
+O `CustomValidator` foi projetado como uma **interface** para permitir múltiplas implementações:
+
+### Implementações Disponíveis
+
+1. **DefaultCustomValidator** - Implementação padrão síncrona
+2. **AsyncCustomValidator** - Implementação assíncrona para melhor performance
+
+### Vantagens da Arquitetura de Interface
+
+- **Flexibilidade**: Permite diferentes estratégias de validação
+- **Extensibilidade**: Fácil adição de novas implementações
+- **Testabilidade**: Facilita mock e testes unitários
+- **Princípio de Inversão de Dependência**: Depende de abstrações, não de implementações
+
+## Uso do CustomValidator
+
+### 1. Criação de um Validador
+
 ```java
-public class FormularioValidator {
-    public boolean validarFormulario(FormularioRequest request) {
-        return ValidationUtils.naoDeveSerNulo(request.getNome()) &&
-               ValidationUtils.deveTerTamanhoEntre(request.getNome(), 3, 50) &&
-               ValidationUtils.deveSerEmail(request.getEmail()) &&
-               ValidationUtils.deveSerCpf(request.getCpf()) &&
-               ValidationUtils.deveSerPositivo(request.getIdade());
-    }
+CustomValidator<ContaRequest> validator = CustomValidator.<ContaRequest>create()
+    .notNull(ContaRequest::getNome, "nome", "Nome é obrigatório")
+    .notEmpty(ContaRequest::getEmail, "email", "Email é obrigatório")
+    .matches(ContaRequest::getEmail, EMAIL_PATTERN, "email", "Email inválido")
+    .minValue(ContaRequest::getSalario, 0.0, "salario", "Salário deve ser positivo")
+    .maxValue(ContaRequest::getSalario, 1000000.0, "salario", "Salário muito alto");
+```
+
+### 2. Validação com Resultado
+
+```java
+ContaRequest conta = new ContaRequest();
+ValidationResult result = validator.validate(conta);
+
+if (result.isValid()) {
+    // Processa a conta
+    System.out.println("Conta válida!");
+} else {
+    // Trata os erros
+    result.getErrors().forEach(error -> 
+        System.out.println(error.getField() + ": " + error.getMessage())
+    );
 }
 ```
 
-### 2. Validação de Configurações
+### 3. Validação com Exceção
+
 ```java
-public class ConfigValidator {
-    public boolean validarConfig(Config config) {
-        return ValidationUtils.deveSerUrl(config.getApiUrl()) &&
-               ValidationUtils.deveSerIpv4(config.getDatabaseHost()) &&
-               ValidationUtils.deveEstarEntre(config.getPort(), 1024, 65535) &&
-               ValidationUtils.deveTerSenhaForte(config.getPassword());
-    }
+// Usando orThrows()
+validator.validate(conta).orThrows();
+
+// Usando validateAndThrow()
+validator.validateAndThrow(conta, "Erro na validação da conta");
+
+// Usando exceção customizada
+validator.validate(conta).orThrows(() -> 
+    new BusinessException("Dados inválidos")
+);
+```
+
+### 4. Validação de Coleções
+
+```java
+CustomValidator<CartaoRequest> cartaoValidator = CustomValidator.<CartaoRequest>create()
+    .notEmpty(CartaoRequest::getNumero, "numero", "Número é obrigatório")
+    .maxLength(CartaoRequest::getNumero, 19, "numero", "Número muito longo");
+
+CustomValidator<ContaRequest> contaValidator = CustomValidator.<ContaRequest>create()
+    .validateCollection(
+        ContaRequest::getCartoes,
+        cartaoValidator,
+        "cartoes",
+        "Cartões inválidos"
+    );
+```
+
+### 5. Regras Críticas
+
+```java
+CustomValidator<ContaRequest> validator = CustomValidator.<ContaRequest>create()
+    .addCriticalRule(
+        conta -> conta.getNome() != null && !conta.getNome().trim().isEmpty(),
+        "nome",
+        "Nome é obrigatório"
+    )
+    .addRule(
+        conta -> conta.getEmail() != null && conta.getEmail().contains("@"),
+        "email",
+        "Email inválido"
+    );
+```
+
+### 6. Usando ValidationRule Existente
+
+```java
+// Cria regras de validação reutilizáveis
+ValidationRule<ContaRequest> nomeRule = ValidationRule.of(
+    conta -> conta.getNome() != null && !conta.getNome().trim().isEmpty(),
+    ValidationMessage.CPF_OBRIGATORIO
+);
+
+ValidationRule<ContaRequest> emailRule = ValidationRule.of(
+    conta -> conta.getEmail() != null && conta.getEmail().contains("@"),
+    ValidationMessage.EMAIL_OBRIGATORIO
+);
+
+// Usa as regras no CustomValidator
+CustomValidator<ContaRequest> validator = CustomValidator.<ContaRequest>create()
+    .addRule(nomeRule)
+    .addRule(emailRule)
+    .addRule(
+        conta -> conta.getTelefone() != null && conta.getTelefone().contains("("),
+        "telefone",
+        "Telefone deve ter formato brasileiro"
+    );
+```
+
+### 7. Validação Assíncrona
+
+```java
+// Cria validador assíncrono para melhor performance
+AsyncCustomValidator<ContaRequest> asyncValidator = new AsyncCustomValidator<>();
+
+asyncValidator
+    .notNull(ContaRequest::getNome, "nome", "Nome é obrigatório")
+    .notEmpty(ContaRequest::getEmail, "email", "Email é obrigatório");
+
+// Executa validação de forma assíncrona
+CompletableFuture<ValidationResult> future = asyncValidator.validateAsync(request);
+ValidationResult result = future.get();
+
+// Não esqueça de fechar o executor
+asyncValidator.shutdown();
+```
+
+## Endpoints de Exemplo
+
+### ValidationBuilder (Sistema Original)
+- `POST /api/contas` - Cria conta com validação Bean Validation
+
+### CustomValidator (Novo Sistema)
+- `POST /api/v2/contas/validar` - Validação com resultado
+- `POST /api/v2/contas/criar` - Validação com exceção
+- `POST /api/v2/contas/criar-or-throws` - Validação usando orThrows()
+- `POST /api/v2/contas/validar-apenas` - Retorna apenas o resultado da validação
+
+## Exemplo de Resposta de Erro
+
+```json
+{
+  "success": false,
+  "message": "Dados inválidos",
+  "errors": {
+    "nome": "Nome é obrigatório",
+    "email": "Email deve ter formato válido",
+    "salario": "Salário deve ser maior ou igual a zero"
+  }
 }
 ```
 
-### 3. Validação de Dados de Negócio
-```java
-public class PedidoValidator {
-    public boolean validarPedido(Pedido pedido) {
-        return ValidationUtils.naoDeveSerVazio(pedido.getItens()) &&
-               ValidationUtils.deveTerTamanhoMinimo(pedido.getItens(), 1) &&
-               ValidationUtils.deveSerPositivo(pedido.getValorTotal()) &&
-               ValidationUtils.deveSerDataFutura(pedido.getDataEntrega());
-    }
-}
+## Vantagens do CustomValidator
+
+1. **Independência**: Não depende do Bean Validation
+2. **Flexibilidade**: API fluente e intuitiva
+3. **Controle**: Você decide quando lançar exceções
+4. **Reutilização**: Validadores podem ser compostos
+5. **Performance**: Validação otimizada com regras críticas
+6. **Testabilidade**: Fácil de testar e mockar
+
+## Executando o Projeto
+
+```bash
+# Compilar
+mvn clean compile
+
+# Executar testes
+mvn test
+
+# Executar aplicação
+mvn spring-boot:run
 ```
+
+## Testes
+
+O projeto inclui testes abrangentes para ambos os sistemas de validação:
+
+- `ValidationBuilderTest` - Testes do sistema original
+- `CustomValidatorTest` - Testes do novo sistema
+- `ContaFluentValidatorTest` - Testes específicos do validador de conta
 
 ## Contribuição
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Adicione testes para suas funcionalidades
-4. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
-5. Push para a branch (`git push origin feature/nova-feature`)
-6. Abra um Pull Request
-
-### Padrões de Código
-- Use os métodos da `ValidationUtils` para validações
-- Adicione testes unitários para novas funcionalidades
-- Mantenha a nomenclatura em português
-- Documente métodos complexos
-
-## Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## Roadmap
-
-- [ ] Validação de PIS/PASEP
-- [ ] Validação de Título de Eleitor
-- [ ] Validação de CNH
-- [ ] Suporte a validações customizadas
-- [ ] Integração com Bean Validation
-- [ ] Validação de arquivos (tamanho, tipo, etc.)
-- [ ] Validação de coordenadas geográficas
-- [ ] Validação de moedas brasileiras 
+Este projeto serve como POC para demonstrar diferentes abordagens de validação em Java. Sinta-se à vontade para contribuir com melhorias e novas funcionalidades. 
